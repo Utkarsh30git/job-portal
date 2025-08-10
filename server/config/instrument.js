@@ -1,6 +1,6 @@
-// Import with `import * as Sentry from "@sentry/node"` if you are using ESM
-import * as Sentry from "@sentry/node";
-const { nodeProfilingIntegration } = require("@sentry/profiling-node");
+// Import with import * as Sentry from "@sentry/node"` if you are using ESM
+import * as Sentry from "@sentry/node"
+import { nodeProfilingIntegration } from "@sentry/profiling-node";
 
 Sentry.init({
   dsn: "https://59396da538ee7d79d8b5b25e4d9e545e@o4509814023716873.ingest.us.sentry.io/4509814031581184",
@@ -13,6 +13,9 @@ Sentry.init({
   profileSessionSampleRate: 1.0,
   // Trace lifecycle automatically enables profiling during active traces
   profileLifecycle: 'trace',
+
+  // Send structured logs to Sentry
+  enableLogs: true,
 
   // Setting this option to true will send default PII data to Sentry.
   // For example, automatic IP address collection on events
