@@ -1,71 +1,142 @@
-import { Webhook } from "svix";
-import User from "../models/User.js";
+import { Webhook } from 'svix';
+import User from '../models/User.js'; // We'll create this model
 
-// API Controlller Function to Manage Clerk User with database
- export const clerkWebhooks = async (req, res) => {
-    try{
+export const clerkWebhooks = async (req, res) => {
+  try {
+    console.log('🔔 Webhook received');
+    
+    // Get the webhook secret from environment variables
+    const WEBHOOK_SECRET = process.env.CLERK_WEBHOOK_SECRET;
+    
+    if (!WEBHOOK_SECRET) {
+      console.error('❌ Missing CLERK_WEBHOOK_SECRET');
+      return res.status(500).json({ error: 'Missing webhook secret' });
+    }
 
-        // create a Svix instance with clerk Webhook secret
-        const whook = new Webhook(process.env.CLERK_WEBHOOK_SECRET);
+    // Get the headers and body
+    const headers = req.headers;
+    const payload = req.body;
 
+    // Create a new Svix instance with your webhook secret
+    const wh = new Webhook(WEBHOOK_SECRET);
 
-        // Verifying Headers
-        await whook.verify(JSON.stringify(req.body),{
-            "svix-id": req.headers["svix-id"],
-            "svix-timestamp": req.headers["svix-timestamp"],
-            "svix-signature": req.headers["svix-signature"]
-        })
+    let evt;
+    try {
+      // Verify the webhook signature
+      evt = wh.verify(JSON.stringify(payload), headers);
+    } catch (err) {
+      console.error('❌ Webhook signature verification failed:', err.message);
+      return res.status(400).json({ error: 'Invalid signature' });
+    }
 
-        // Getting data from request body
-        const { type, data } = req.body;
+    // Extract the data from the event
+    const { id, ...attributes } = evt.data;
+    const eventType = evt.type;
 
-        // Switch Cases for different Events 
-        switch (type) {
-             // Handle user created event
-            case "user.created":{
+    console.log(`📩 Processing event: ${eventType} for user: ${id}`);
 
-               const userData ={
-                _id:data.id,
-                email:data.email_addresses[0].email_address,
-                name:data.first_name + " " + data.last_name,
-                imageUrl:data.image_url,
-                resume:''
-               }
-               await User.create(userData);
-               res.json({})
-               break;
-            }
-               
-              // Handle user updated event   
-            case "user.updated":{
-                const userData = {
-                
-                email:data.email_addresses[0].email_address,
-                name:data.first_name + " " + data.last_name,
-                imageUrl:data.image_url,
-               
-               }
-               await User.findByIdAndUpdate(data.id, userData);
-               res.json({})
-               break;
-            }
-               
-               // Handle user deleted event   
-            case "user.deleted": {
-                await User.findByIdAndDelete(data.id);
-               res.json({})
-               break;
-            }
-              
-                
-            default:
-                // Handle unknown event type
-                break;
+    // Handle different event types
+    switch (eventType) {
+      case 'user.created':
+        try {
+          // Check if user already exists (prevent duplicates)
+          const existingUser = await User.findOne({ clerkId: id });
+          
+          if (existingUser) {
+            console.log('⚠️  User already exists in database');
+            return res.status(200).json({ message: 'User already exists' });
+          }
+
+          // Create new user in MongoDB
+          const newUser = new User({
+            clerkId: id,
+            email: attributes.email_addresses?.[0]?.email_address,
+            firstName: attributes.first_name || '',
+            lastName: attributes.last_name || '',
+            imageUrl: attributes.image_url || '',
+            createdAt: new Date(),
+            updatedAt: new Date()
+          });
+
+          await newUser.save();
+          
+          console.log('✅ User created successfully in MongoDB:', {
+            id: newUser._id,
+            clerkId: id,
+            email: newUser.email
+          });
+
+        } catch (createError) {
+          console.error('❌ Error creating user:', createError);
+          // Don't return error to Clerk - let it retry
+          if (createError.code === 11000) {
+            console.log('Duplicate key error - user already exists');
+            return res.status(200).json({ message: 'User already exists' });
+          }
+          throw createError;
         }
+        break;
 
+      case 'user.updated':
+        try {
+          const updatedUser = await User.findOneAndUpdate(
+            { clerkId: id },
+            {
+              email: attributes.email_addresses?.[0]?.email_address,
+              firstName: attributes.first_name || '',
+              lastName: attributes.last_name || '',
+              imageUrl: attributes.image_url || '',
+              updatedAt: new Date()
+            },
+            { new: true }
+          );
+
+          if (updatedUser) {
+            console.log('✅ User updated successfully:', updatedUser.email);
+          } else {
+            console.log('⚠️  User not found for update:', id);
+          }
+        } catch (updateError) {
+          console.error('❌ Error updating user:', updateError);
+          throw updateError;
+        }
+        break;
+
+      case 'user.deleted':
+        try {
+          const deletedUser = await User.findOneAndDelete({ clerkId: id });
+          
+          if (deletedUser) {
+            console.log('✅ User deleted successfully:', deletedUser.email);
+          } else {
+            console.log('⚠️  User not found for deletion:', id);
+          }
+        } catch (deleteError) {
+          console.error('❌ Error deleting user:', deleteError);
+          throw deleteError;
+        }
+        break;
+
+      default:
+        console.log(`ℹ️  Unhandled event type: ${eventType}`);
     }
-    catch (error) {
-        console.log(error.message);
-        res.json({success:false,message:'Webhooks Error'})
-    }
-}
+
+    // Return success response to Clerk
+    return res.status(200).json({ 
+      message: 'Webhook processed successfully',
+      eventType: eventType,
+      userId: id,
+      timestamp: new Date().toISOString()
+    });
+
+  } catch (error) {
+    console.error('❌ Webhook processing failed:', error);
+    
+    // Return error response to Clerk
+    return res.status(500).json({ 
+      error: 'Webhook processing failed',
+      message: error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
+};
