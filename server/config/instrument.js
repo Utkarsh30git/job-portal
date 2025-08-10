@@ -3,12 +3,13 @@ import * as Sentry from "@sentry/node"
 import { nodeProfilingIntegration } from "@sentry/profiling-node";
 
 Sentry.init({
-  dsn: "https://59396da538ee7d79d8b5b25e4d9e545e@o4509814023716873.ingest.us.sentry.io/4509814031581184",
+  dsn: "https://0f20fab365816c43380fb8b214bb4956@o4509814023716873.ingest.us.sentry.io/4509820156051456",
   integrations: [
     nodeProfilingIntegration(),
+    Sentry.mongooseIntegration()
   ],
   // Tracing
-  tracesSampleRate: 1.0, //  Capture 100% of the transactions
+  // tracesSampleRate: 1.0, //  Capture 100% of the transactions
   // Set sampling rate for profiling - this is evaluated only once per SDK.init call
   profileSessionSampleRate: 1.0,
   // Trace lifecycle automatically enables profiling during active traces
