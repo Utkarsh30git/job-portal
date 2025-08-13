@@ -6,7 +6,8 @@ import connectDB from './config/db.js'
 import * as Sentry from "@sentry/node"
 import companyRoutes from './routes/companyRoutes.js';
 import connectCloudinary from './config/cloudinary.js';
-
+import { clerkWebhooks } from './controllers/webhooks.js';
+import jobRoutes from './routes/jobRoutes.js';
 // Initialise Express
 const app = express();
 
@@ -31,6 +32,7 @@ app.get("/debug-sentry", function mainHandler(req, res) {
 app.post('/webhooks',clerkWebhooks)
 
 app.use('/api/company', companyRoutes);
+app.use('/api/jobs', jobRoutes);
 
 
 // port
