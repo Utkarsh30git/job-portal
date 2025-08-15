@@ -67,7 +67,7 @@ import Job from "../models/Job.js";
 
         const company = await Company.findOne({ email });
 
-        if(bcrypt.compare(password,company.password)){
+        if( await bcrypt.compare(password,company.password)){
             res.json({
                 success:true,
                 company:{
