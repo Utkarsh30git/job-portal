@@ -133,7 +133,12 @@ const ApplyJob = () => {
               <h2 className='font-bold text-xl mb-4'>More Jobs from {JobData.companyId.name}</h2>
               <div className='space-y-4'>
                 {jobs.filter(job => job._id !== JobData._id && job.companyId._id === JobData.companyId._id)
-                     .slice(0, 4)
+                     .filter(job => {
+                      //  Set of applied jobIds
+                      const appliedJobIds = new Set(userApplications.map(app => app.jobId && app.jobId._id));
+                    //  Return true if the user has not applied for this job
+                      return !appliedJobIds.has(job._id);
+                     }).slice(0, 4)
                      .map((job, index) => <JobCard key={index} job={job} />)}
               </div>
             </div>
