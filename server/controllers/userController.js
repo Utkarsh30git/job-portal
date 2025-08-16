@@ -8,7 +8,7 @@ import {v2 as cloudinary} from 'cloudinary';
 // Get User data
 export const getUserData = async (req, res) => {
      
-    const userId = req.auth.userId
+    const userId = req.auth().userId
 
     try {
         
@@ -30,7 +30,7 @@ export const applyForJob = async (req, res) => {
 
     const { jobId } = req.body;
 
-    const userId= req.auth.userId
+    const userId= req.auth().userId
 
     try {
         
@@ -88,9 +88,9 @@ export const updateUserResume  = async (req, res) => {
 
     try {
         
-        const userId = req.auth.userId;
+        const userId = req.auth().userId;
 
-        const resumeFile= req.resumeFile
+        const resumeFile= req.file;
 
         const userData = await User.findById(userId);
 
