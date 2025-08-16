@@ -12,7 +12,7 @@ import ManageJobs from './pages/ManageJobs'
 import ViewApplications from './pages/viewApplications'
 import Home from './pages/home'
 import 'quill/dist/quill.snow.css'
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 
 const App = () => {
 
