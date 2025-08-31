@@ -62,7 +62,7 @@ useEffect(()=>{
           isEdit || (userData && userData.resume === '')
            ? <>
              <label className='flex items-center' htmlFor="resumeUpload">
-              <p className='bg-blue-100 text-blue-600 px-4 py-2 rounded-lg mr-2'>{resume ? resume.name : 'Select Resume'}</p>
+              <p className='bg-blue-100 text-[#0EA5E9] px-4 py-2 rounded-lg mr-2'>{resume ? resume.name : 'Select Resume'}</p>
               <input id='resumeUpload' onChange={(e) => setResume(e.target.files[0])} accept='application/pdf' type="file" hidden />
               <img src={assets.profile_upload_icon} alt="" />
              </label>
@@ -72,7 +72,7 @@ useEffect(()=>{
            </>
           : <div className='flex gap-2'>
              <a 
-               className='bg-blue-100 text-blue-600 px-4 py-2 rounded-lg' 
+               className='bg-blue-100 text-[#0EA5E9] px-4 py-2 rounded-lg' 
                href={userData.resume}
                target="_blank"
                rel="noopener noreferrer"

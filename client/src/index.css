@@ -5,9 +5,13 @@
 
 *{
     font-family: Outfit;
+    
 }
 
  /* Custom Class names */
+
+
+
 
  @layer base{
     html {
@@ -32,3 +36,4 @@
  .rich-text ol { margin-left: 30px; list-style-type: decimal; }
 .rich-text ul { margin-left: 30px; list-style-type: disc; }
 .rich-text li { margin-bottom: 8px; }
+

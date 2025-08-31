@@ -1,26 +1,57 @@
 import React from 'react'
-
 import { useNavigate } from 'react-router-dom'
 
 const JobCard = ({ job }) => {
-
-
   const navigate = useNavigate();
-
+  
   return (
-    <div className=' mt-10 border-none p-6 shadow-md rounded'>
-      <div className='flex justify-between items-center '>
-        <img className='h-8' src={job.companyId.image} alt="" />
+    <div className="mt-10 bg-white border border-gray-200 p-6 shadow-lg rounded-xl flex flex-col justify-between hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group">
+      {/* Top content */}
+      <div>
+        <div className="flex justify-between items-center">
+          <div className="bg-gray-50 rounded-lg p-2 border border-gray-100">
+            <img className="h-8" src={job.companyId.image} alt="" />
+          </div>
+        </div>
+        <h4 className="font-semibold text-xl mt-4 text-gray-900 group-hover:text-[#0EA5E9] transition-colors duration-300">
+          {job.title}
+        </h4>
+        
+        <div className="flex items-center gap-3 mt-3 text-xs">
+          <span className="bg-blue-50 border border-blue-200 text-blue-700 px-4 py-1.5 rounded-full font-medium">
+            {job.location}
+          </span>
+          <span className="bg-green-50 border border-green-200 text-green-700 px-4 py-1.5 rounded-full font-medium">
+            {job.level}
+          </span>
+        </div>
+        
+        <p 
+          className="text-gray-600 text-sm mt-4 leading-relaxed"
+          dangerouslySetInnerHTML={{ __html: job.description.slice(0, 150) }}
+        ></p>
       </div>
-      <h4 className='font-medium text-xl mt-2'>{job.title}</h4>
-      <div className='flex items-center gap-3 mt-2 text-xs'>
-        <span className='bg-blue-50 border border-blue-200 px-4 py-1.5 rounded'>{job.location}</span>
-        <span className='bg-red-50 border border-red-200 px-4 py-1.5 rounded'>{job.level}</span>
-      </div>
-      <p className='text-gray-500 text-sm mt-4' dangerouslySetInnerHTML={{__html:job.description.slice(0,150)}}></p>
-      <div className='mt-4 flex gap-4 text-sm'>
-        <button onClick={()=>{navigate(`/apply-job/${job._id}`); scrollTo(0,0)}}className='bg-blue-600 text-white px-4 py-2 rounded'>Apply now</button>
-        <button onClick={()=>{navigate(`/apply-job/${job._id}`); scrollTo(0,0)}}className='text-gray-500 border border-gray-500 rounded px-4 py-2'>Learn more</button>
+      
+      {/* Bottom buttons */}
+      <div className="mt-6 flex gap-4 text-sm">
+        <button
+          onClick={() => {
+            navigate(`/apply-job/${job._id}`)
+            scrollTo(0, 0)
+          }}
+          className="bg-gradient-to-r from-[#0EA5E9] to-[#0284C7] hover:from-[#0284C7] hover:to-[#0369A1] text-black font-semibold px-6 py-2.5 rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-300 ease-in-out hover:-translate-y-0.5 active:scale-95 focus:outline-none focus:ring-3 focus:ring-blue-200"
+        >
+          Apply now
+        </button>
+        <button
+          onClick={() => {
+            navigate(`/apply-job/${job._id}`)
+            scrollTo(0, 0)
+          }}
+          className="text-gray-600 border border-gray-300 hover:border-[#0EA5E9] hover:text-[#0EA5E9] rounded-lg px-6 py-2.5 hover:bg-blue-50 transition-all duration-300 ease-in-out transform hover:scale-105 active:scale-95 font-medium"
+        >
+          Learn more
+        </button>
       </div>
     </div>
   )

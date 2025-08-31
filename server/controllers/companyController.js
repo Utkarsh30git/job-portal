@@ -67,6 +67,12 @@ import JobApplication from "../models/jobApplication.js";
     try{
 
         const company = await Company.findOne({ email });
+         if (!company) {
+            return res.json({
+                success: false,
+                message: 'Invalid email or password'
+            });
+        }
 
         if( await bcrypt.compare(password,company.password)){
             res.json({
