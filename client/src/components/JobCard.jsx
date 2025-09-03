@@ -10,7 +10,13 @@ const JobCard = ({ job }) => {
       <div>
         <div className="flex justify-between items-center">
           <div className="bg-gray-50 rounded-lg p-2 border border-gray-100">
-            <img className="h-8" src={job.companyId.image} alt="" />
+            {job.companyId?.image ? (
+              <img className="h-8" src={job.companyId.image} alt={job.companyId.name || "Company"} />
+            ) : (
+              <div className="h-8 w-8 bg-gray-300 rounded flex items-center justify-center text-gray-600 text-xs font-semibold">
+                {job.companyId?.name ? job.companyId.name.charAt(0).toUpperCase() : 'C'}
+              </div>
+            )}
           </div>
         </div>
         <h4 className="font-semibold text-xl mt-4 text-gray-900 group-hover:text-[#0EA5E9] transition-colors duration-300">
@@ -28,7 +34,7 @@ const JobCard = ({ job }) => {
         
         <p 
           className="text-gray-600 text-sm mt-4 leading-relaxed"
-          dangerouslySetInnerHTML={{ __html: job.description.slice(0, 150) }}
+          dangerouslySetInnerHTML={{ __html: job.description ? job.description.slice(0, 150) : '' }}
         ></p>
       </div>
       
