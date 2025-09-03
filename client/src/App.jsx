@@ -31,7 +31,7 @@ const App = () => {
          companyToken ? <>
          <Route path='add-job' element={<AddJob />} />
           <Route path='manage-jobs' element={<ManageJobs />} />
-         <Route path='view-applications' element={<Applications />} />
+         <Route path='view-applications' element={<ViewApplications />} />
 
          </> : null
          }
